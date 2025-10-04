@@ -1,4 +1,4 @@
-package com.dqs.batallas;
+package com.dqs.modelos;
 public class Batalla {
 
 }
