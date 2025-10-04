@@ -1,24 +1,86 @@
-# Compiled class file
+# ====================================
+# Archivos compilados
+# ====================================
 *.class
+*.o
+*.out
+*.exe
 
-# Log file
+# ====================================
+# Archivos de log
+# ====================================
 *.log
 
-# BlueJ files
-*.ctxt
+# ====================================
+# Archivos temporales
+# ====================================
+*.tmp
+*.temp
+*.swp
+*.swo
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
+# ====================================
+# Paquetes y archivos comprimidos
+# ====================================
 *.jar
 *.war
-*.nar
 *.ear
+*.nar
 *.zip
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+# ====================================
+# Errores de JVM
+# ====================================
 hs_err_pid*
 replay_pid*
+
+# ====================================
+# IDEs y editores
+# Ignora en cualquier subcarpeta
+# ====================================
+
+# VS Code
+**/.vscode/
+
+# IntelliJ IDEA
+**/.idea/
+*.iml
+out/
+
+# Eclipse
+**/.project
+**/.classpath
+**/.settings/
+bin/
+
+# NetBeans
+**/nbproject/private/
+**/build/
+**/nbbuild/
+**/dist/
+**/nbdist/
+**/.nb-gradle/
+
+# ====================================
+# Herramientas de build
+# ====================================
+
+# Gradle
+**/.gradle/
+**/build/
+
+# Maven
+**/target/
+
+# ====================================
+# Archivos del sistema operativo
+# ====================================
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
