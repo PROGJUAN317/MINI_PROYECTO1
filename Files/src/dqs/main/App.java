@@ -1,4 +1,4 @@
-package com.dqs.main;
+package dqs.main;
 
 public class App {
     public static void main(String[] args) {
