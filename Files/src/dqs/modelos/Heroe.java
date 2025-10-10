@@ -172,6 +172,44 @@ public class Heroe extends Personaje implements Sanador, Tanque {
         }
     }
 
+    // MÉTODO DE ATAQUE
+    public void atacar(Personaje objetivo) {
+        if (objetivo != null && objetivo.esta_vivo()) {
+            int daño = this.ataque - objetivo.getDefensa();
+            if (daño < 1) daño = 1; // Daño mínimo de 1
+            
+            objetivo.recibir_daño(daño);
+            System.out.println(this.nombre + " (" + tipo.name() + ") ataca a " + objetivo.getNombre() + 
+                             " causando " + daño + " puntos de daño!");
+            
+            if (!objetivo.esta_vivo()) {
+                System.out.println(objetivo.getNombre() + " ha sido derrotado!");
+            }
+        } else {
+            System.out.println(this.nombre + " no puede atacar a un objetivo inválido o muerto.");
+        }
+    }
+
+    // Método para atacar en el contexto de una batalla (busca automáticamente enemigos)
+    public void atacarEnemigo(Enemigo[] enemigos) {
+        Enemigo objetivo = buscarEnemigoVivo(enemigos);
+        if (objetivo != null) {
+            atacar(objetivo);
+        } else {
+            System.out.println(this.nombre + " no encuentra enemigos vivos para atacar.");
+        }
+    }
+
+    // Método auxiliar para buscar un enemigo vivo
+    private Enemigo buscarEnemigoVivo(Enemigo[] enemigos) {
+        for (Enemigo enemigo : enemigos) {
+            if (enemigo != null && enemigo.esta_vivo()) {
+                return enemigo;
+            }
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
         return "Heroe: " + nombre + " | " + tipo.name() + " | HP: " + hp +
