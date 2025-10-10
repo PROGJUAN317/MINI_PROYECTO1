@@ -7,6 +7,7 @@ public abstract class Personaje {
     protected int ataque;
     protected int defensa;
     protected int velocidad;
+    protected boolean esta_vivo = true;
     public String getNombre() { return nombre; }
     public int getHp() { return hp; }
     public int getMp() { return mp; }
@@ -28,13 +29,15 @@ public abstract class Personaje {
         this.ataque = ataque;
         this.defensa = defensa;
         this.velocidad = velocidad;
+        this.esta_vivo = hp > 0;
     }
     public void recibir_daño(int cantidad){
         hp -= cantidad;
         if (hp < 0) hp = 0;
+        esta_vivo = hp > 0;
     }
     public boolean esta_vivo() {
-        return hp > 0;
+        return esta_vivo;
     }
     public abstract void elegirAccion();
 }

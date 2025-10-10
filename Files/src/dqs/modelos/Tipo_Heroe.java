@@ -25,20 +25,20 @@ public enum Tipo_Heroe {
         this.descripcion = descripcion;
     }
 
-    // Método para obtener la descripción del tipo de héroe
-    public int getMinHp() {
+    // Métodos para obtener los rangos de atributos
+    public int getMinHP() {
         return minHp;
     }
 
-    public int getMaxHp() {
+    public int getMaxHP() {
         return maxHp;
     }
 
-    public int getMinMp() {
+    public int getMinMP() {
         return minMp;
     }
 
-    public int getMaxMp() {
+    public int getMaxMP() {
         return maxMp;
     }
 
