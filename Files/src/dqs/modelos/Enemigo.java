@@ -91,4 +91,13 @@ public class Enemigo extends Personaje implements Agresivo {
         if (daño < 0) this.ataque = 0;
         else this.ataque = daño;
     }
+
+    @Override
+    public String toString() {
+        return "Enemigo: " + nombre + " | " + tipo.name() + " | HP: " + hp +
+         " | MP: " + mp +
+         " | Ataque: " + ataque +
+         " | Defensa: " + defensa +
+         " | Velocidad: " + velocidad;
+    }
 }
