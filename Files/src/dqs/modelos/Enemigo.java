@@ -63,6 +63,7 @@ public class Enemigo extends Personaje implements Agresivo {
         }
 	}
     
+        @SuppressWarnings("unused")
     private Heroe buscarHeroeVivo(Heroe[] heroes) {
         for (Heroe heroe : heroes) {
             if (heroe != null && heroe.esta_vivo()) {
