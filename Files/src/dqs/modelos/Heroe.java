@@ -98,21 +98,107 @@ public class Heroe extends Personaje implements Sanador, Tanque {
     
     // MÉTODOS DE LA INTERFAZ TANQUE
     @Override
-    public void aumentarDefensa(int cantidad) {
-        this.defensa += cantidad;
-        System.out.println(nombre + " aumenta su defensa en " + cantidad + " puntos.");
+    public void aumentarDefensa(int defensa) {
+        if (tipo == Tipo_Heroe.GUERRERO || tipo == Tipo_Heroe.PALADIN) {
+            if (mp >= 10) {
+                mp -= 10;
+                this.defensa += defensa;
+                System.out.println(nombre + " aumenta su defensa en " + defensa + " puntos.");
+            } else {
+                System.out.println(nombre + " no tiene suficiente MP para aumentar defensa.");
+            }
+        } else {
+            System.out.println(nombre + " no puede aumentar defensa.");
+        }
     }
-    
+
     @Override
     public void defender(Personaje aliado) {
-        System.out.println(nombre + " se prepara para defender a " + aliado.getNombre());
-        // Lógica para reducir el daño que recibe el aliado
+        if (tipo == Tipo_Heroe.GUERRERO || tipo == Tipo_Heroe.PALADIN) {
+            if (mp >= 10) {
+                mp -= 10;
+                
+                // Remover defensa anterior si existe
+                if (aliado.estaSiendoDefendido()) {
+                    aliado.removerDefensa();
+                }
+                
+                // Activar nueva defensa
+                aliado.recibirDefensa(this);
+                System.out.println(nombre + " está defendiendo a " + aliado.getNombre() + 
+                                 "! Los próximos ataques tendrán defensa combinada.");
+            } else {
+                System.out.println(nombre + " no tiene suficiente MP para defender.");
+            }
+        } else {
+            System.out.println(nombre + " no puede defender a otros.");
+        }
     }
     
     @Override
     public void provocarEnemigo(Personaje enemigo) {
-        System.out.println(nombre + " provoca a " + enemigo.getNombre() + " para que lo ataque!");
-        // Lógica para forzar al enemigo a atacar a este héroe
+        if (tipo == Tipo_Heroe.GUERRERO || tipo == Tipo_Heroe.PALADIN) {
+            if (mp >= 5) {
+                mp -= 5;
+                
+                // Remover provocación anterior si existe
+                if (enemigo.estaProvocado()) {
+                    enemigo.removerProvocacion();
+                }
+                
+                // Aplicar nueva provocación
+                enemigo.serProvocado(this);
+                System.out.println(nombre + " provoca a " + enemigo.getNombre() + 
+                                 "! El enemigo debe atacar al tanque en su próximo turno.");
+            } else {
+                System.out.println(nombre + " no tiene suficiente MP para provocar.");
+            }
+        } else {
+            System.out.println(nombre + " no puede provocar enemigos.");
+        }
+    }
+    
+    // Método para dejar de defender a un aliado
+    public void dejarDeDefender(Personaje aliado) {
+        if (aliado.estaSiendoDefendido() && aliado.getDefensor() == this) {
+            aliado.removerDefensa();
+            System.out.println(nombre + " ha dejado de defender a " + aliado.getNombre());
+        }
+    }
+    
+    // Método para provocar a todos los enemigos en un arreglo (área de efecto)
+    public void provocarTodosLosEnemigos(Personaje[] enemigos) {
+        if (tipo == Tipo_Heroe.GUERRERO || tipo == Tipo_Heroe.PALADIN) {    
+            int costoPorEnemigo = 3;
+            int enemigosVivos = 0;
+            
+            // Contar enemigos vivos
+            for (Personaje enemigo : enemigos) {
+                if (enemigo != null && enemigo.esta_vivo()) {
+                    enemigosVivos++;
+                }
+            }
+            
+            int costoTotal = costoPorEnemigo * enemigosVivos;
+            
+            if (mp >= costoTotal) {
+                mp -= costoTotal;
+                System.out.println(nombre + " provoca a todos los enemigos vivos!");
+                
+                for (Personaje enemigo : enemigos) {
+                    if (enemigo != null && enemigo.esta_vivo()) {
+                        if (enemigo.estaProvocado()) {
+                            enemigo.removerProvocacion();
+                        }
+                        enemigo.serProvocado(this);
+                    }
+                }
+            } else {
+                System.out.println(nombre + " no tiene suficiente MP para provocar a todos los enemigos. Costo: " + costoTotal);
+            }
+        } else {
+            System.out.println(nombre + " no puede provocar enemigos.");
+        }
     }
     // MÉTODOS DE LA INTERFAZ SANADOR
     @Override
