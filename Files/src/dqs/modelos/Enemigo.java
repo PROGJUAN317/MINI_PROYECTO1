@@ -1,4 +1,3 @@
-
 package dqs.modelos;
 
 public class Enemigo extends Personaje implements Agresivo {
@@ -27,7 +26,7 @@ public class Enemigo extends Personaje implements Agresivo {
         System.out.println("--------------------------------------");
     }
 
-    public static Enemigo crearEnemigo(String nombre, Tipo_Enemigo tipo) {
+    public static Enemigo crearEnemigo(Tipo_Enemigo tipo, String nombre) {
         int hp = (int)(Math.random() * (tipo.getMaxHp() - tipo.getMinHp() + 1)) + tipo.getMinHp();
         int mp = (int)(Math.random() * (tipo.getMaxMp() - tipo.getMinMp() + 1)) + tipo.getMinMp();
         int ataque = (int)(Math.random() * (tipo.getMaxAtaque() - tipo.getMinAtaque() + 1)) + tipo.getMinAtaque();
@@ -43,18 +42,52 @@ public class Enemigo extends Personaje implements Agresivo {
 
 	@Override
 	public void elegirAccion() {
-		// Simple placeholder AI: actual targeting/decision logic should be added later.
-		// Currently this method intentionally does nothing to avoid null behavior.
+		System.out.println(nombre + " (" + tipo.name() + ") esta eligiendo su acción...");
 	}
 
 	@Override
 	public void atacar(Personaje objetivo) {
-		// Placeholder implementation of a basic attack; real logic can use stats from Personaje.
-		// Currently no action to keep compilation independent of Personaje internals.
+		if (objetivo != null && objetivo.esta_vivo()) {
+            int daño = this.ataque - objetivo.getDefensa();
+            if (daño < 1) daño = 1; // Daño mínimo de 1
+            
+            objetivo.recibir_daño(daño);
+            System.out.println(this.nombre + " (" + tipo.name() + ") ataca a " + objetivo.getNombre() + 
+                             " causando " + daño + " puntos de daño!");
+            
+            if (!objetivo.esta_vivo()) {
+                System.out.println(objetivo.getNombre() + " ha sido derrotado!");
+            }
+        } else {
+            System.out.println(this.nombre + " no puede atacar a un objetivo inválido o muerto.");
+        }
 	}
+    
+    private Heroe buscarHeroeVivo(Heroe[] heroes) {
+        for (Heroe heroe : heroes) {
+            if (heroe != null && heroe.esta_vivo()) {
+                return heroe;
+            }
+        }
+        return null;
+    }
 
-	@Override
-	public void usarHabilidadEspecial(Personaje objetivo) {
-		// Placeholder for special ability; implement effect on `objetivo` as needed.
-	}
+    @Override
+    public void usarHabilidadEspecial(Personaje objetivo) {
+        int daño = this.ataque * 2 - objetivo.getDefensa();
+        if (daño < 1) daño = 1; // Daño mínimo de 1
+        
+        objetivo.recibir_daño(daño);
+        System.out.println(this.nombre + " (" + tipo.name() + ") usa su habilidad especial contra " + objetivo.getNombre() + 
+                         " causando " + daño + " puntos de daño!");
+        
+        if (!objetivo.esta_vivo()) {
+            System.out.println(objetivo.getNombre() + " ha sido derrotado!");
+        }
+    }
+
+    public void setDaño(int daño) {
+        if (daño < 0) this.ataque = 0;
+        else this.ataque = daño;
+    }
 }
