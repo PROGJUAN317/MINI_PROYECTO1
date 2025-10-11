@@ -2,8 +2,8 @@ package dqs.modelos;
 
 public class Batalla {
 
-    private Heroe[] equipoHeroes;
-    private Enemigo[] equipoEnemigos;
+    private final Heroe[] equipoHeroes;
+    private final Enemigo[] equipoEnemigos;
     private int turnoActual;
     private boolean batallaTerminada;
 
@@ -47,7 +47,8 @@ public class Batalla {
     public void crearYAgregarEnemigo(int posicion) {
         if (posicion >= 0 && posicion < equipoEnemigos.length) {
             System.out.println("\n=== Creando enemigo para la posición " + (posicion + 1) + " ===");
-            equipoEnemigos[posicion] = Enemigo.crearEnemigoPorConsola();
+            // Usar el primer tipo disponible como valor por defecto y un nombre generado automáticamente.
+            equipoEnemigos[posicion] = Enemigo.crearEnemigo(Tipo_Enemigo.values()[0], "Enemigo " + (posicion + 1));
             System.out.println("¡Enemigo agregado exitosamente!");
         } else {
             throw new IllegalArgumentException("Posición inválida para el equipo de enemigos.");

@@ -3,7 +3,7 @@ package dqs.modelos;
 import java.util.Scanner;
 
 public class Heroe extends Personaje implements Sanador, Tanque {
-    private Tipo_Heroe tipo;
+    private final Tipo_Heroe tipo;
 
     public Heroe(String nombre, Tipo_Heroe tipo, int hp, int mp, int ataque, int defensa, int velocidad) {
         super(nombre, hp, mp, ataque, defensa, velocidad);
