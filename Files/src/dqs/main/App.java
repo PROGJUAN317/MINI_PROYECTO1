@@ -4,8 +4,8 @@ import dqs.modelos.*;
 import java.util.Scanner;
 
 public class App {
-    private static Scanner scanner = new Scanner(System.in);
-    private static Batalla batalla = new Batalla();
+    private static final Scanner scanner = new Scanner(System.in);
+    private static final Batalla batalla = new Batalla();
 
     public static void main(String[] args) {
         System.out.println("  ¡Bienvenido al Sistema de Batallas RPG!");
@@ -27,24 +27,15 @@ public class App {
             int opcion = leerEntero();
             
             switch (opcion) {
-                case 1:
-                    menuCrearEquipos();
-                    break;
-                case 2:
-                    batalla.mostrarEquipos();
-                    break;
-                case 3:
-                    iniciarBatalla();
-                    break;
-                case 4:
-                    menuPruebaMecanicas();
-                    break;
-                case 5:
+                case 1 -> menuCrearEquipos();
+                case 2 -> batalla.mostrarEquipos();
+                case 3 -> iniciarBatalla();
+                case 4 -> menuPruebaMecanicas();
+                case 5 -> {
                     System.out.println("¡Gracias por jugar! ");
                     System.exit(0);
-                    break;
-                default:
-                    System.out.println(" Opción inválida. Intente de nuevo.");
+                }
+                default -> System.out.println(" Opción inválida. Intente de nuevo.");
             }
         }
     }
@@ -61,22 +52,11 @@ public class App {
         int opcion = leerEntero();
         
         switch (opcion) {
-            case 1:
-                batalla.crearEquipoHeroes();
-                break;
-            case 2:
-                batalla.crearEquipoEnemigos();
-                break;
-            case 3:
-                crearHeroeIndividual();
-                break;
-            case 4:
-                crearEnemigoIndividual();
-                break;
-            case 5:
-                return;
-            default:
-                System.out.println(" Opción inválida.");
+            case 1 -> batalla.crearEquipoHeroes();
+            case 2 -> batalla.crearEquipoEnemigos();
+            case 3 -> crearHeroeIndividual();
+            case 4 -> crearEnemigoIndividual();
+            default -> System.out.println(" Opción inválida.");
         }
     }
     
@@ -166,7 +146,7 @@ public class App {
                     enemigo.atacarConProvocacion(convertirHeroesAPersonajes(batalla.getEquipoHeroes()));
                     
                     // Pausa entre acciones de enemigos
-                    try { Thread.sleep(1000); } catch (InterruptedException e) {}
+                    try { Thread.sleep(1000); } catch (InterruptedException _) {}
                 }
             }
             
@@ -207,8 +187,7 @@ public class App {
     }
     
     private static void turnoHeroesManual() {
-        for (int i = 0; i < batalla.getEquipoHeroes().length; i++) {
-            Heroe heroe = batalla.getEquipoHeroes()[i];
+        for (Heroe heroe : batalla.getEquipoHeroes()) {
             if (heroe != null && heroe.esta_vivo()) {
                 System.out.println("\n Es el turno de: " + heroe.getNombre() + " [" + heroe.getTipo().name() + "]");
                 System.out.println("HP: " + heroe.getHp() + " | MP: " + heroe.getMp());
@@ -255,47 +234,58 @@ public class App {
     
     private static boolean ejecutarAccionHeroe(Heroe heroe, int opcion) {
         switch (opcion) {
-            case 1: // Atacar
+            case 1 -> {
+                // Atacar
                 return atacarConHeroe(heroe);
-            case 2: // Defender (solo Guerrero/Paladin)
+            }
+            case 2 -> {
+                // Defender (solo Guerrero/Paladin)
                 if (heroe.getTipo() == Tipo_Heroe.GUERRERO || heroe.getTipo() == Tipo_Heroe.PALADIN) {
                     return defenderConHeroe(heroe);
                 }
-                break;
-            case 3: // Provocar (solo Guerrero/Paladin)
+            }
+            case 3 -> {
+                // Provocar (solo Guerrero/Paladin)
                 if (heroe.getTipo() == Tipo_Heroe.GUERRERO || heroe.getTipo() == Tipo_Heroe.PALADIN) {
                     return provocarConHeroe(heroe);
                 }
-                break;
-            case 4: // Aumentar Defensa (solo Guerrero/Paladin)
+            }
+            case 4 -> {
+                // Aumentar Defensa (solo Guerrero/Paladin)
                 if (heroe.getTipo() == Tipo_Heroe.GUERRERO || heroe.getTipo() == Tipo_Heroe.PALADIN) {
                     heroe.aumentarDefensa(10);
                     return true;
                 }
-                break;
-            case 5: // Curar (solo Druida/Paladin)
+            }
+            case 5 -> {
+                // Curar (solo Druida/Paladin)
                 if (heroe.getTipo() == Tipo_Heroe.DRUIDA || heroe.getTipo() == Tipo_Heroe.PALADIN) {
                     return curarConHeroe(heroe);
                 }
-                break;
-            case 6: // Restaurar Mana (solo Druida)
+            }
+            case 6 -> {
+                // Restaurar Mana (solo Druida)
                 if (heroe.getTipo() == Tipo_Heroe.DRUIDA) {
                     return restaurarManaConHeroe(heroe);
                 }
-                break;
-            case 7: // Eliminar Efecto (solo Druida/Paladin)
+            }
+            case 7 -> {
+                // Eliminar Efecto (solo Druida/Paladin)
                 if (heroe.getTipo() == Tipo_Heroe.DRUIDA || heroe.getTipo() == Tipo_Heroe.PALADIN) {
                     return eliminarEfectoConHeroe(heroe);
                 }
-                break;
-            case 8: // Revivir (solo Paladin)
+            }
+            case 8 -> {
+                // Revivir (solo Paladin)
                 if (heroe.getTipo() == Tipo_Heroe.PALADIN) {
                     return revivirConHeroe(heroe);
                 }
-                break;
-            case 9: // Pasar turno
+            }
+            case 9 -> {
+                // Pasar turno
                 System.out.println(heroe.getNombre() + " pasa su turno.");
                 return true;
+            }
         }
         
         System.out.println(" Opción inválida o no disponible para este tipo de héroe.");
@@ -343,19 +333,10 @@ public class App {
         int opcion = leerEntero();
         
         switch (opcion) {
-            case 1:
-                pruebaDefensaTanque();
-                break;
-            case 2:
-                pruebaProvocacion();
-                break;
-            case 3:
-                pruebaCuracion();
-                break;
-            case 4:
-                return;
-            default:
-                System.out.println(" Opción inválida.");
+            case 1 -> pruebaDefensaTanque();
+            case 2 -> pruebaProvocacion();
+            case 3 -> pruebaCuracion();
+            default -> System.out.println(" Opción inválida.");
         }
     }
     
@@ -499,11 +480,10 @@ public class App {
     private static Enemigo seleccionarEnemigo() {
         System.out.println("Enemigos disponibles:");
         int contador = 1;
-        for (int i = 0; i < batalla.getEquipoEnemigos().length; i++) {
-            Enemigo enemigo = batalla.getEquipoEnemigos()[i];
+        for (Enemigo enemigo : batalla.getEquipoEnemigos()) {
             if (enemigo != null && enemigo.esta_vivo()) {
                 System.out.println(contador + ". " + enemigo.getNombre() + " [" + enemigo.getTipo().name() + "] " +
-                                 "HP: " + enemigo.getHp());
+                        "HP: " + enemigo.getHp());
                 contador++;
             }
         }
@@ -531,11 +511,10 @@ public class App {
     private static Heroe seleccionarHeroe() {
         System.out.println("Héroes disponibles:");
         int contador = 1;
-        for (int i = 0; i < batalla.getEquipoHeroes().length; i++) {
-            Heroe heroe = batalla.getEquipoHeroes()[i];
+        for (Heroe heroe : batalla.getEquipoHeroes()) {
             if (heroe != null && heroe.esta_vivo()) {
                 System.out.println(contador + ". " + heroe.getNombre() + " [" + heroe.getTipo().name() + "] " +
-                                 "HP: " + heroe.getHp() + " | MP: " + heroe.getMp());
+                        "HP: " + heroe.getHp() + " | MP: " + heroe.getMp());
                 contador++;
             }
         }
@@ -563,11 +542,10 @@ public class App {
     private static Heroe seleccionarHeroeMuerto() {
         System.out.println("Héroes caídos:");
         int contador = 1;
-        for (int i = 0; i < batalla.getEquipoHeroes().length; i++) {
-            Heroe heroe = batalla.getEquipoHeroes()[i];
+        for (Heroe heroe : batalla.getEquipoHeroes()) {
             if (heroe != null && !heroe.esta_vivo()) {
                 System.out.println(contador + ". " + heroe.getNombre() + " [" + heroe.getTipo().name() + "] " +
-                                 "HP: " + heroe.getHp());
+                        "HP: " + heroe.getHp());
                 contador++;
             }
         }
