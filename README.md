@@ -8,6 +8,6 @@ Finalmente el "App", que se usa como main para ejecutar todo.
 
 Samuel Garcia Parra - 2459476
 
-Juan Sebastian Navarrete Rada - 
+Juan Sebastian Navarrete Rada - 2459562
 
 Juan David Correa Zapata - 2459431
