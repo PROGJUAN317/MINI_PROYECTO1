@@ -1,5 +1,11 @@
-import java.util.Scanner;
 package dqs.modelos;
+
+import java.util.Scanner;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
 public class Heroe extends Personaje implements Sanador, Tanque {
     private TipoHeroe tipo;
 
@@ -7,25 +13,33 @@ public class Heroe extends Personaje implements Sanador, Tanque {
         super(nombre, hp, mp, ataque, defensa, velocidad);
         this.tipo = tipo;
 
-        if(!tipo.validarAtributos(hp, mp, ataque, defensa)) {
+// Validar todos los atributos, incluyendo velocidad
+        if (!tipo.validarAtributos(hp, mp, ataque, defensa, velocidad)) {
             throw new IllegalArgumentException(
                 "Atributos fuera del rango permitido para el tipo " + tipo.name() +
-            "\nHP: " + tipo.getMinHP() + " - " + tipo.getMaxHP() +
-            "|MP: " + tipo.getMinMP() + " - " + tipo.getMaxMP() +
-            "|Ataque: " + tipo.getMinAtaque() + " - " + tipo.getMaxAtaque() +
-            "|Defensa: " + tipo.getMinDefensa() + " - " + tipo.getMaxDefensa() +
+                "\nHP: " + tipo.getMinHP() + " - " + tipo.getMaxHP() +
+                " | MP: " + tipo.getMinMP() + " - " + tipo.getMaxMP() +
+                " | Ataque: " + tipo.getMinAtaque() + " - " + tipo.getMaxAtaque() +
+                " | Defensa: " + tipo.getMinDefensa() + " - " + tipo.getMaxDefensa() +
+                " | Velocidad: 5 - 100"
             );
+        }
+
+// Validación explícita del rango de velocidad
+        if (velocidad < 5 || velocidad > 100) {
+            throw new IllegalArgumentException("La velocidad debe estar entre 5 y 100.");
+        }
     }
-    
-    //METODO PARA CREAR UN HEROE PIDIENDO DATOS POR CONSOLA
+
+// ===== MÉTODO PARA CREAR UN HÉROE DESDE CONSOLA =====
     public static Heroe crearHeroePorConsola() {
         Scanner sc = new Scanner(System.in);
 
-        System.out.print("Crear héroe: ");
+        System.out.println("\n=== CREAR HÉROE ===");
         System.out.print("Nombre: ");
         String nombre = sc.nextLine();
 
-        System.out.print("Seleccione el tipo de heroe: ");
+        System.out.println("\nSeleccione el tipo de héroe:");
         for (TipoHeroe t : TipoHeroe.values()) {
             System.out.println("- " + t.name() + ": " + t.getDescripcion());
         }
@@ -38,139 +52,83 @@ public class Heroe extends Personaje implements Sanador, Tanque {
                 tipo = TipoHeroe.valueOf(entrada);
             } catch (IllegalArgumentException e) {
                 System.out.println("Tipo inválido. Intente de nuevo.");
-            } 
+            }
         }
 
-        System.out.print("\nIngrese los atributos dentro de los rasgos permitidos:");
-        System.out.print("HP: " + tipo.getMinHP() + " - " + tipo.getMaxHP());
-        System.out.print("MP: " + tipo.getMinMP() + " - " + tipo.getMaxMP());
-        System.out.print("Ataque: " + tipo.getMinAtaque() + " - " + tipo.getMaxAtaque());
-        System.out.print("Defensa: " + tipo.getMinDefensa() + " - " + tipo.getMaxDefensa());
+        System.out.println("\nIngrese los atributos dentro de los rangos permitidos:");
+        System.out.println("HP: " + tipo.getMinHP() + " - " + tipo.getMaxHP());
+        System.out.println("MP: " + tipo.getMinMP() + " - " + tipo.getMaxMP());
+        System.out.println("Ataque: " + tipo.getMinAtaque() + " - " + tipo.getMaxAtaque());
+        System.out.println("Defensa: " + tipo.getMinDefensa() + " - " + tipo.getMaxDefensa());
+        System.out.println("Velocidad: 5 - 100");
 
-        int hp = pedirEnRango(sc, "HP", tipo.getMinHP(), tipo.getMaxHP());
-        int mp = pedirEnRango(sc, "MP", tipo.getMinMP(), tipo.getMaxMP());
-        int ataque = pedirEnRango(sc, "Ataque", tipo.getMinAtaque(), tipo.getMaxAtaque());
-        int defensa = pedirEnRango(sc, "Defensa", tipo.getMinDefensa(), tipo.getMaxDefensa());
-        int velocidad = (int)(Math.random() * 20 + 10);
+        int hp = leerAtributo(sc, "HP", tipo.getMinHP(), tipo.getMaxHP());
+        int mp = leerAtributo(sc, "MP", tipo.getMinMP(), tipo.getMaxMP());
+        int ataque = leerAtributo(sc, "Ataque", tipo.getMinAtaque(), tipo.getMaxAtaque());
+        int defensa = leerAtributo(sc, "Defensa", tipo.getMinDefensa(), tipo.getMaxDefensa());
+        int velocidad = leerAtributo(sc, "Velocidad", 5, 100);
 
         return new Heroe(nombre, tipo, hp, mp, ataque, defensa, velocidad);
     }
 
-//METODO AUXILIAR PARA PEDIR NUMEROS DENTRO DE UN RANGO
- private static int pedirEnRango(Scanner sc, String atributo, int min, int max) {
+    private static int leerAtributo(Scanner sc, String nombre, int min, int max) {
         int valor;
         while (true) {
-            System.out.print(atributo + ": ");
-            try {
-                valor = Integer.parseInt(sc.nextLine());
-                if (valor >= min && valor <= max) {
-                    break;
-                } else {
-                    System.out.println(" El valor debe estar entre " + min + " y " + max + ".");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println(" Ingresa un número válido.");
-            }
+            System.out.print(nombre + ": ");
+            valor = sc.nextInt();
+            if (valor >= min && valor <= max) break;
+            System.out.println(" Valor fuera del rango permitido (" + min + " - " + max + "). Intente de nuevo.");
         }
         return valor;
     }
-
-    public void mostrarEstado() {
-        System.out.println("\n " + nombre + " [" + tipo.name() + "]");
-        System.out.println("HP: " + hp + " | MP: " + mp +
-                           " | Ataque: " + ataque + " | Defensa: " + defensa +
-                           " | Velocidad: " + velocidad);
-        System.out.println("Descripción: " + tipo.getDescripcion());
-        System.out.println("--------------------------------------");
-    }
-
-    public void elegirAccion()
-}
-
-
 
     public TipoHeroe getTipo() {
         return tipo;
     }
 
-    @Override
-    public void elegirAccion() {
-        System.out.println(nombre + " (" + tipo.name() + ") esta eligiendo su acción...");
-    }
-// METODO DE LA INTERFAZ SANADOR
-    @Override
-    public void curar(Personaje objetivo) {
-        if (tipo == TipoHeroe.SANADOR || tipo == TipoHeroe.PALADIN) {
-            if (mp >= 15) {
-                mp -= 15;
-                objetivo.recibirCuracion(-30);
-                System.out.println(nombre + " ha curado a " + objetivo.getNombre() + " por 30 puntos de vida.");
-            } else {
-                System.out.println(nombre + " no tiene suficiente MP para curar.");
+// ===== SISTEMA DE BATALLA POR VELOCIDAD =====
+    public static void batallaPorVelocidad(List<Heroe> heroes, List<Enemigo> enemigos) {
+        System.out.println("\n=== COMIENZA LA BATALLA ===");
+
+        List<Personaje> participantes = new ArrayList<>();
+        participantes.addAll(heroes);
+        participantes.addAll(enemigos);
+
+// Orden descendente de velocidad
+        Collections.sort(participantes, Comparator.comparingInt(Personaje::getVelocidad).reversed());
+
+        for (Personaje p : participantes) {
+            if (p.getHp() <= 0) continue;
+
+            System.out.println("\nTurno de " + p.getNombre() + " (Velocidad: " + p.getVelocidad() + ")");
+
+            if (p instanceof Heroe) {
+                Enemigo objetivo = enemigos.stream().filter(e -> e.getHp() > 0).findFirst().orElse(null);
+                if (objetivo != null) {
+                    p.atacar(objetivo);
+                }
+            } else if (p instanceof Enemigo) {
+                Heroe objetivo = heroes.stream().filter(h -> h.getHp() > 0).findFirst().orElse(null);
+                if (objetivo != null) {
+                    p.atacar(objetivo);
+                }
             }
-        } else {
-            System.out.println(nombre + " no puede curar.");
         }
-}
 
-@Override
-public void revivir(Personaje objetivo) {
-    if (tipo == TipoHeroe.PALADIN) {
-        if (!objetivo.estaVivo() && mp >= 25) {
-            mp -= 25;
-            objetivo.recibirDanio(-5);
-            System.out.println(nombre + " ha revivido a " + objetivo.getNombre() + " con 50 puntos de vida.");
-        } else if(objetivo.estaVivo()) {
-            System.out.println(objetivo.getNombre() + " ya está vivo.");
-        } else {
-            System.out.println(nombre + " no puede revivir a otros.");
-        }
+        System.out.println("\n=== BATALLA FINALIZADA ===");
     }
-@Override
-public void restaurarMana(Personaje objetivo) {
-    if (tipo == TipoHeroe.DRUIDA) {
-        if (mp >= 20) {
-            mp -= 10;
-            objetivo.recibirMana(25);
-            System.out.println(nombre + " ha restaurado 25 puntos de MP a " + objetivo.getNombre() + ".");
-        } else {
-            System.out.println(nombre + " no tiene suficiente MP para restaurar.");
-        }
-    } else {
-        System.out.println(nombre + " no puede restaurar mana.");
+
+    @Override
+    public String toString() {
+        return "Heroe{" +
+                "nombre='" + getNombre() + '\'' +
+                ", tipo=" + tipo +
+                ", HP=" + getHp() +
+                ", MP=" + getMp() +
+                ", Ataque=" + getAtaque() +
+                ", Defensa=" + getDefensa() +
+                ", Velocidad=" + getVelocidad() +
+                '}';
     }
 }
 
-@Override
-public void eliminarEfectoNegativo(Personaje objetivo) {
-    if (tipo == TipoHeroe.DRUIDA || tipo == TipoHeroe.PALADIN) {
-
-        System.out.println(nombre + "  elimina efectos negativos de " + objetivo.getNombre() + " veneno.");
-        objetivo.limpiarEstados();
-        } else {
-            System.out.println(nombre + " no puede eliminar efectos negativos de " + objetivo.getNombre() + ".");
-        }
-    }
-
-//MÉTODOS DE LA INTERFAZ TANQUE
-@Override
-public void protegerAliado(Personaje aliado) {
-    if (tipo == TipoHeroe.GUERRERO || tipo == TipoHeroe.PALADIN) {
-        int danioReducido = (int) (danio * 0.7);
-        super.recibirDanio(danioReducido);
-        System.out.println(nombre + " resiste el golpe con su armadura. Daño recibido: " + danioReducido);
-
-    } else {
-        super.recibirDanio(danio);
-        System.out.println(nombre + " recibe el golpe completo. Daño recibido: " + danio);
-    }
-}
-
-@Override
-public String toString() {
-    return "Heroe: " + nombre + " |  " + tipo.name() + " | HP: " + hp +
-     " | MP: " + mp +
-     " | Ataque: " + ataque +
-     " | Defensa: " + defensa +
-     " | Velocidad: " + velocidad;
-}
