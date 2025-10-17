@@ -47,9 +47,16 @@ public class Batalla {
     public void crearYAgregarEnemigo(int posicion) {
         if (posicion >= 0 && posicion < equipoEnemigos.length) {
             System.out.println("\n=== Creando enemigo para la posición " + (posicion + 1) + " ===");
-            // Usar el primer tipo disponible como valor por defecto y un nombre generado automáticamente.
-            equipoEnemigos[posicion] = Enemigo.crearEnemigo(Tipo_Enemigo.values()[0], "Enemigo " + (posicion + 1));
-            System.out.println("¡Enemigo agregado exitosamente!");
+            // Seleccionar un tipo de enemigo aleatorio
+            Tipo_Enemigo[] tiposDisponibles = Tipo_Enemigo.values();
+            int indiceAleatorio = (int)(Math.random() * tiposDisponibles.length);
+            Tipo_Enemigo tipoAleatorio = tiposDisponibles[indiceAleatorio];
+            
+            // Crear nombre descriptivo basado en el tipo
+            String nombreEnemigo = tipoAleatorio.name() + " " + (posicion + 1);
+            
+            equipoEnemigos[posicion] = Enemigo.crearEnemigo(tipoAleatorio, nombreEnemigo);
+            System.out.println("¡Enemigo " + tipoAleatorio.name() + " agregado exitosamente!");
         } else {
             throw new IllegalArgumentException("Posición inválida para el equipo de enemigos.");
         }
