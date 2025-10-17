@@ -2,6 +2,9 @@ package dqs.main;
 
 import dqs.modelos.*;
 import java.util.Scanner;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class App {
     private static final Scanner scanner = new Scanner(System.in);
@@ -140,14 +143,32 @@ public class App {
             System.out.println("Presione Enter para continuar con el turno de los enemigos...");
             scanner.nextLine();
             
-            for (Enemigo enemigo : batalla.getEquipoEnemigos()) {
+            // Ejecutar acciones de enemigos con un scheduler para evitar bloquear el hilo principal
+            Enemigo[] enemigos = batalla.getEquipoEnemigos();
+            ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+            long delayMs = 0L;
+            final long stepMs = 1000L; // pausa entre acciones
+
+            for (Enemigo enemigo : enemigos) {
                 if (enemigo != null && enemigo.esta_vivo()) {
-                    System.out.println("\n" + enemigo.getNombre() + " está actuando...");
-                    enemigo.atacarConProvocacion(convertirHeroesAPersonajes(batalla.getEquipoHeroes()));
-                    
-                    // Pausa entre acciones de enemigos
-                    try { Thread.sleep(1000); } catch (InterruptedException _) {}
+                    Enemigo eFinal = enemigo; // para usar dentro de la lambda
+                    scheduler.schedule(() -> {
+                        System.out.println("\n" + eFinal.getNombre() + " está actuando...");
+                        eFinal.atacarConProvocacion(convertirHeroesAPersonajes(batalla.getEquipoHeroes()));
+                    }, delayMs, TimeUnit.MILLISECONDS);
+                    delayMs += stepMs;
                 }
+            }
+
+            // esperar a que terminen todas las tareas programadas
+            scheduler.shutdown();
+            try {
+                if (!scheduler.awaitTermination(delayMs + 500, TimeUnit.MILLISECONDS)) {
+                    scheduler.shutdownNow();
+                }
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                scheduler.shutdownNow();
             }
             
             if (verificarVictoria()) break;
@@ -343,9 +364,9 @@ public class App {
     private static void pruebaDefensaTanque() {
         System.out.println("\n PRUEBA DE DEFENSA DEL TANQUE ");
         
-        // Crear personajes de prueba
+    // Crear personajes de prueba
         Heroe tanque = new Heroe("Tanque", Tipo_Heroe.GUERRERO, 200, 50, 40, 30, 15);
-        Heroe mago = new Heroe("Mago", Tipo_Heroe.MAGO, 80, 150, 50, 15, 20);
+        Heroe mago = new Heroe("Mago", Tipo_Heroe.MAGO, 80, 150, 35, 15, 20);
         Enemigo enemigo = Enemigo.crearEnemigo(Tipo_Enemigo.ORCO, "Orco Feroz");
         
         System.out.println("Antes de la defensa:");
@@ -579,6 +600,11 @@ public class App {
     private static int leerEntero() {
         while (true) {
             try {
+                // Si no hay más líneas (entrada cerrada), salir de forma limpia
+                if (!scanner.hasNextLine()) {
+                    System.out.println("\nNo hay entrada disponible. Terminando la aplicación.");
+                    System.exit(0);
+                }
                 String input = scanner.nextLine();
                 return Integer.parseInt(input);
             } catch (NumberFormatException e) {

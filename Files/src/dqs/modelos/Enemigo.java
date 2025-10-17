@@ -62,16 +62,42 @@ public class Enemigo extends Personaje implements Agresivo {
             System.out.println(this.nombre + " no puede atacar a un objetivo inválido o muerto.");
         }
 	}
-    
-    
-        @SuppressWarnings("unused")
-    private Heroe buscarHeroeVivo(Heroe[] heroes) {
-        for (Heroe heroe : heroes) {
-            if (heroe != null && heroe.esta_vivo()) {
-                return heroe;
+
+    // Busca y devuelve un héroe vivo aleatorio del array proporcionado
+    public Heroe buscarHeroeVivo(Heroe[] heroes) {
+        if (heroes == null || heroes.length == 0) return null;
+
+        // Contar héroes vivos
+        int vivos = 0;
+        for (Heroe h : heroes) {
+            if (h != null && h.esta_vivo()) vivos++;
+        }
+        if (vivos == 0) return null;
+
+        // Elegir un índice aleatorio entre 0 y vivos-1
+        int elegido = (int) (Math.random() * vivos);
+        int idx = 0;
+        for (Heroe h : heroes) {
+            if (h != null && h.esta_vivo()) {
+                if (idx == elegido) return h;
+                idx++;
             }
         }
         return null;
+    }
+
+    // Permite al enemigo elegir y atacar a un héroe vivo del array proporcionado
+    public void atacarAleatorio(Heroe[] heroes) {
+        if (heroes == null || heroes.length == 0) {
+            System.out.println(this.nombre + " no tiene héroes a los que atacar.");
+            return;
+        }
+        Heroe objetivo = buscarHeroeVivo(heroes);
+        if (objetivo != null) {
+            atacar(objetivo);
+        } else {
+            System.out.println(this.nombre + " no encontró héroes vivos para atacar.");
+        }
     }
 
     @Override
