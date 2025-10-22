@@ -109,5 +109,105 @@ public class Batalla {
     public void setTurnoActual(int turnoActual) {
          this.turnoActual = turnoActual; }
 
+    // Métodos para el sistema de velocidades
+    
+    private java.util.List<Personaje> obtenerOrdenPorVelocidad(Heroe[] heroes, Enemigo[] enemigos) {
+        java.util.List<Personaje> participantes = new java.util.ArrayList<>();
+        for (Heroe h : heroes) if (h != null && h.esta_vivo()) participantes.add(h);
+        for (Enemigo e : enemigos) if (e != null && e.esta_vivo()) participantes.add(e);
+
+        // Ordenar por velocidad descendente; si empate, tie-breaker: héroes antes que enemigos, luego random
+        java.util.Collections.sort(participantes, (a, b) -> {
+            int diff = Integer.compare(b.getVelocidad(), a.getVelocidad()); // descendente
+            if (diff != 0) return diff;
+            // tie-breaker: héroes antes que enemigos
+            if (a instanceof Heroe && !(b instanceof Heroe)) return -1;
+            if (!(a instanceof Heroe) && b instanceof Heroe) return 1;
+            // por defecto, azar
+            return Double.compare(Math.random(), Math.random());
+        });
+
+        return participantes;
+    }
+    
+    public boolean ejecutarTurnoPorVelocidad(Heroe[] heroes, Enemigo[] enemigos, boolean modoManual) {
+        java.util.List<Personaje> orden = obtenerOrdenPorVelocidad(heroes, enemigos);
+        System.out.println("Orden de acción para este turno:");
+        for (Personaje p : orden) {
+            System.out.println(" - " + p.getNombre() + " (vel=" + p.getVelocidad() + ")");
+        }
+
+        for (Personaje actor : orden) {
+            if (actor == null || !actor.esta_vivo()) continue;
+            if (actor.estaParalizado()) {
+                System.out.println(actor.getNombre() + " está paralizado y salta su turno."); 
+                continue;
+            }
+
+            if (actor instanceof Heroe) {
+                Heroe h = (Heroe) actor;
+                if (modoManual) {
+                    // En modo manual, se requiere interacción del usuario (delegado a App)
+                    // Este método solo se usa en modo automático para pruebas
+                    Enemigo objetivo = elegirEnemigoVivo(enemigos);
+                    if (objetivo != null) h.atacar(objetivo);
+                } else {
+                    // IA simple: atacar al primer enemigo vivo
+                    Enemigo objetivo = elegirEnemigoVivo(enemigos);
+                    if (objetivo != null) h.atacar(objetivo);
+                }
+            } else if (actor instanceof Enemigo) {
+                Enemigo e = (Enemigo) actor;
+                // Si está provocado, atacar al provocador
+                if (e.estaProvocado() && e.getProvocador() != null && e.getProvocador().esta_vivo()) {
+                    e.atacar(e.getProvocador());
+                    continue;
+                }
+                // Comportamiento enemigo: atacar héroe vivo aleatorio
+                Heroe objetivo = elegirHeroeVivo(heroes);
+                if (objetivo != null) {
+                    e.atacar(objetivo);
+                }
+            }
+        }
+
+        // Al final del turno, decrementar estados globalmente
+        for (Heroe h : heroes) if (h != null) h.decrementarEstadosPorTurno();
+        for (Enemigo e : enemigos) if (e != null) e.decrementarEstadosPorTurno();
+
+        // comprobar victoria/derrota
+        boolean heroesVivos = hayHeroesVivos(heroes);
+        boolean enemigosVivos = hayEnemigosVivos(enemigos);
+        if (!heroesVivos) {
+            System.out.println("Derrota: todos los héroes han muerto.");
+            return false;
+        }
+        if (!enemigosVivos) {
+            System.out.println("Victoria: todos los enemigos han sido derrotados.");
+            return true;
+        }
+        // si la batalla no terminó, retorna null (indicado con false aquí por simplicidad)
+        return false; // batalla continúa
+    }
+    
+    private boolean hayHeroesVivos(Heroe[] heroes) {
+        for (Heroe h : heroes) if (h != null && h.esta_vivo()) return true;
+        return false;
+    }
+    
+    private boolean hayEnemigosVivos(Enemigo[] enemigos) {
+        for (Enemigo e : enemigos) if (e != null && e.esta_vivo()) return true;
+        return false;
+    }
+    
+    private Enemigo elegirEnemigoVivo(Enemigo[] enemigos) {
+        for (Enemigo e : enemigos) if (e != null && e.esta_vivo()) return e;
+        return null;
+    }
+    
+    private Heroe elegirHeroeVivo(Heroe[] heroes) {
+        for (Heroe h : heroes) if (h != null && h.esta_vivo()) return h;
+        return null;
+    }
 
 }
