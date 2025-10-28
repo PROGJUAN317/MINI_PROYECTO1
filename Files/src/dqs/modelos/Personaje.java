@@ -12,6 +12,8 @@ public abstract class Personaje {
     protected Personaje defensor = null;
     protected boolean esta_provocado = false;
     protected Personaje provocador = null;
+    protected boolean esta_paralizado = false;
+    protected int turnosParalizados = 0;
     public String getNombre() { return nombre; }
     public int getHp() { return hp; }
     public int getMp() { return mp; }
@@ -113,6 +115,36 @@ public abstract class Personaje {
     
     public Personaje getProvocador() {
         return provocador;
+    }
+    
+    // Métodos para manejar la parálisis
+    public boolean estaParalizado() {
+        return esta_paralizado;
+    }
+    
+    public void serParalizado(int turnos) {
+        this.esta_paralizado = true;
+        this.turnosParalizados = turnos;
+        System.out.println(this.nombre + " ha sido paralizado por " + turnos + " turnos!");
+    }
+    
+    public void removerParalisis() {
+        if (esta_paralizado) {
+            System.out.println(this.nombre + " ya no está paralizado.");
+            this.esta_paralizado = false;
+            this.turnosParalizados = 0;
+        }
+    }
+    
+    // Método para decrementar estados al final del turno
+    public void decrementarEstadosPorTurno() {
+        // Decrementar parálisis
+        if (esta_paralizado && turnosParalizados > 0) {
+            turnosParalizados--;
+            if (turnosParalizados <= 0) {
+                removerParalisis();
+            }
+        }
     }
     
     // Método para seleccionar objetivo respetando la provocación

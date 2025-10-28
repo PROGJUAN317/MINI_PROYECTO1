@@ -119,10 +119,34 @@ public class App {
             return;
         }
         
-        System.out.println("\n ¡LA BATALLA COMIENZA! ");
-        batalla.mostrarEquipos();
+        System.out.println("\n=== MODO DE BATALLA ===");
+        System.out.println("1. Batalla Tradicional (Manual)");
+        System.out.println("2. Batalla por Velocidad (Manual)");
+        System.out.println("3. Batalla por Velocidad (Automático)");
+        System.out.println("4. Cancelar");
+        System.out.print("Seleccione el modo de batalla: ");
         
-        simulacionDeBatalla();
+        int modo = leerEntero();
+        
+        switch (modo) {
+            case 1 -> {
+                System.out.println("\n ¡LA BATALLA COMIENZA! (Modo Tradicional)");
+                batalla.mostrarEquipos();
+                simulacionDeBatalla();
+            }
+            case 2 -> {
+                System.out.println("\n ¡LA BATALLA COMIENZA! (Modo Por Velocidad - Manual)");
+                batalla.mostrarEquipos();
+                simulacionBatallaPorVelocidad(true);
+            }
+            case 3 -> {
+                System.out.println("\n ¡LA BATALLA COMIENZA! (Modo Por Velocidad - Automático)");
+                batalla.mostrarEquipos();
+                simulacionBatallaPorVelocidad(false);
+            }
+            case 4 -> System.out.println("Batalla cancelada.");
+            default -> System.out.println(" Opción inválida.");
+        }
     }
     
     private static void simulacionDeBatalla() {
@@ -183,6 +207,128 @@ public class App {
             System.out.println("\nPresione Enter para continuar al siguiente turno...");
             scanner.nextLine();
         }
+    }
+    
+    private static void simulacionBatallaPorVelocidad(boolean modoManual) {
+        int turno = 1;
+        batalla.setBatallaTerminada(false);
+        
+        while (!batalla.isBatallaTerminada()) {
+            System.out.println("\n=== TURNO " + turno + " (Por Velocidad) ===");
+            mostrarEstadoActual();
+            
+            if (modoManual) {
+                // Modo manual: ejecutar turno con interacción del usuario
+                ejecutarTurnoVelocidadManual();
+            } else {
+                // Modo automático: usar la lógica de Batalla
+                System.out.println("\nPresione Enter para ejecutar el turno automáticamente...");
+                scanner.nextLine();
+                boolean resultado = batalla.ejecutarTurnoPorVelocidad(
+                    batalla.getEquipoHeroes(), 
+                    batalla.getEquipoEnemigos(), 
+                    false
+                );
+                
+                // Verificar resultado
+                if (!hayHeroesVivos()) {
+                    System.out.println("\n ¡Los Enemigos han ganado la batalla!");
+                    batalla.setBatallaTerminada(true);
+                    break;
+                } else if (!hayEnemigosVivos()) {
+                    System.out.println("\n ¡Los Héroes han ganado la batalla!");
+                    batalla.setBatallaTerminada(true);
+                    break;
+                }
+            }
+            
+            turno++;
+            
+            if (turno > 50) { // Límite de seguridad
+                System.out.println(" ¡La batalla ha durado demasiado! Es un empate.");
+                break;
+            }
+            
+            if (!batalla.isBatallaTerminada() && !modoManual) {
+                System.out.println("\nPresione Enter para continuar al siguiente turno...");
+                scanner.nextLine();
+            }
+        }
+    }
+    
+    private static void ejecutarTurnoVelocidadManual() {
+        // Obtener orden de participantes por velocidad
+        java.util.List<Personaje> orden = new java.util.ArrayList<>();
+        for (Heroe h : batalla.getEquipoHeroes()) 
+            if (h != null && h.esta_vivo()) orden.add(h);
+        for (Enemigo e : batalla.getEquipoEnemigos()) 
+            if (e != null && e.esta_vivo()) orden.add(e);
+
+        // Ordenar por velocidad descendente
+        java.util.Collections.sort(orden, (a, b) -> {
+            int diff = Integer.compare(b.getVelocidad(), a.getVelocidad());
+            if (diff != 0) return diff;
+            if (a instanceof Heroe && !(b instanceof Heroe)) return -1;
+            if (!(a instanceof Heroe) && b instanceof Heroe) return 1;
+            return Double.compare(Math.random(), Math.random());
+        });
+
+        System.out.println("\nOrden de acción para este turno:");
+        for (Personaje p : orden) {
+            String tipo = (p instanceof Heroe) ? "Héroe" : "Enemigo";
+            System.out.println(" - " + p.getNombre() + " (" + tipo + ", vel=" + p.getVelocidad() + ")");
+        }
+
+        // Ejecutar turno de cada participante
+        for (Personaje actor : orden) {
+            if (actor == null || !actor.esta_vivo()) continue;
+            
+            if (actor.estaParalizado()) {
+                System.out.println("\n" + actor.getNombre() + " está paralizado y salta su turno."); 
+                continue;
+            }
+
+            if (actor instanceof Heroe) {
+                Heroe heroe = (Heroe) actor;
+                System.out.println("\n Es el turno de: " + heroe.getNombre() + " [" + heroe.getTipo().name() + "]");
+                System.out.println("HP: " + heroe.getHp() + " | MP: " + heroe.getMp() + " | Velocidad: " + heroe.getVelocidad());
+                mostrarMenuAccionHeroe(heroe);
+            } else if (actor instanceof Enemigo) {
+                Enemigo enemigo = (Enemigo) actor;
+                System.out.println("\n" + enemigo.getNombre() + " está actuando...");
+                
+                // Si está provocado, atacar al provocador
+                if (enemigo.estaProvocado() && enemigo.getProvocador() != null && enemigo.getProvocador().esta_vivo()) {
+                    enemigo.atacar(enemigo.getProvocador());
+                } else {
+                    // Atacar héroe aleatorio
+                    enemigo.atacarConProvocacion(convertirHeroesAPersonajes(batalla.getEquipoHeroes()));
+                }
+            }
+            
+            // Verificar victoria después de cada acción
+            if (verificarVictoria()) {
+                return;
+            }
+        }
+
+        // Al final del turno, decrementar estados
+        for (Heroe h : batalla.getEquipoHeroes()) 
+            if (h != null) h.decrementarEstadosPorTurno();
+        for (Enemigo e : batalla.getEquipoEnemigos()) 
+            if (e != null) e.decrementarEstadosPorTurno();
+    }
+    
+    private static boolean hayHeroesVivos() {
+        for (Heroe h : batalla.getEquipoHeroes()) 
+            if (h != null && h.esta_vivo()) return true;
+        return false;
+    }
+    
+    private static boolean hayEnemigosVivos() {
+        for (Enemigo e : batalla.getEquipoEnemigos()) 
+            if (e != null && e.esta_vivo()) return true;
+        return false;
     }
     
     private static void mostrarEstadoActual() {
